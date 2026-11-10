@@ -1,0 +1,22 @@
+name: Verify architecture
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: dart pub get --enforce-lockfile
+        working-directory: tool/lint
+      - run: dart analyze
+        working-directory: tool/lint
+      - run: dart test
+        working-directory: tool/lint
+      - run: flutter analyze --no-pub
+      - run: flutter test --no-pub
+      - run: dart run tool/mason/verify_templates.dart

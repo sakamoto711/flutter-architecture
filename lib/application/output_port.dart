@@ -14,5 +14,6 @@ abstract interface class OutputPort<T> {
   /// エラー発生時
   ///
   /// ユースケースの実行で例外が発生した場合に呼び出されます。
-  VoidFutureOr onError(Exception e);
+  /// [stackTrace] は元の失敗箇所の情報を保持します。
+  VoidFutureOr onError(Exception e, StackTrace stackTrace);
 }

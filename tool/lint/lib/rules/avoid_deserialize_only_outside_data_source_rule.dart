@@ -22,7 +22,7 @@ class AvoidDeserializeOnlyOutsideDataSourceRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     final visitor = _Visitor(this);
     registry.addPropertyAccess(this, visitor);
     registry.addPrefixedIdentifier(this, visitor);

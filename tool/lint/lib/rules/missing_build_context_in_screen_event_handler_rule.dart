@@ -29,7 +29,7 @@ class MissingBuildContextInScreenEventHandlerRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     registry.addMethodDeclaration(this, _Visitor(this));
   }
 }

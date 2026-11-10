@@ -27,7 +27,7 @@ class AvoidUnnecessaryExplicitTypeRule extends ProjectDartLintRule {
       const LintCode("avoid_unnecessary_explicit_type", "Avoid explicit type declarations that can be inferred.", correctionMessage: "Remove the explicit type and let Dart infer it.");
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     final visitor = _Visitor(this);
     registry.addVariableDeclarationList(this, visitor);
     registry.addForEachPartsWithDeclaration(this, visitor);

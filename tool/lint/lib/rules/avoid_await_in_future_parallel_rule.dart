@@ -34,7 +34,7 @@ class AvoidAwaitInFutureParallelRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     registry.addMethodInvocation(this, _Visitor(this));
   }
 }

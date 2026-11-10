@@ -49,8 +49,8 @@ class InputPortInvoker<P extends InputPortParameter, T> {
     try {
       await _inputPort.perform(parameter, resultOutputPort);
       return resultOutputPort.result;
-    } catch (e) {
-      return Failure(e);
+    } catch (e, stackTrace) {
+      return Failure(e, stackTrace);
     }
   }
 }
@@ -79,9 +79,9 @@ mixin OutputPortMixin<T> implements OutputPort<T> {
 
   @override
   @nonVirtual
-  void onError(Exception e) {
+  void onError(Exception e, StackTrace stackTrace) {
     if (_result != null) throw InputPortAlreadyCompletedError();
-    _result = Failure(e);
+    _result = Failure(e, stackTrace);
   }
 }
 

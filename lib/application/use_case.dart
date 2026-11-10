@@ -41,7 +41,7 @@ sealed class UseCase<P extends InputPortParameter, T> implements InputPort<P, T>
       logger.debug(message: "ユースケースの実行が完了", context: Context({"useCase": runtimeType, "result": result}));
     } catch (e, stackTrace) {
       logger.error(message: "ユースケースの実行で例外が発生", context: Context({"useCase": runtimeType, "parameter": parameter}), error: e, stackTrace: stackTrace);
-      await outputPort.onError(e.asOrNull<Exception>() ?? UnexpectedThrowableException(e));
+      await outputPort.onError(e.asOrNull<Exception>() ?? UnexpectedThrowableException(e), stackTrace);
       return;
     }
 

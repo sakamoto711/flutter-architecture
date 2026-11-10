@@ -1,12 +1,13 @@
 import "package:flutter_architecture/common/event/event.dart";
 import "package:flutter_architecture/common/event/event_subscriber.dart";
+import "package:flutter_architecture/common/logger/noop_logger.dart";
 import "package:flutter_architecture/domain/counter/event/counter_changed.dart";
 import "package:flutter_architecture/infrastructure/event/event_bus_impl.dart";
 import "package:flutter_test/flutter_test.dart";
 
 void main() {
   test("配信中の解除と追加は進行中のリスナー列を壊さない", () {
-    final bus = EventBusImpl();
+    final bus = EventBusImpl(logger: const NoopLogger());
     final received = <String>[];
     final removed = _Listener(() => received.add("removed"));
     final added = _Listener(() => received.add("added"));

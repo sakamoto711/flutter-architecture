@@ -15,5 +15,7 @@ abstract interface class EventBus {
   void removeListener(EventListener listener);
 
   /// イベント通知
+  /// Delivery failures are recorded per listener; remaining listeners still receive the event.
+  /// Delivery completion does not guarantee that asynchronous subscribers have refreshed.
   void notify(Event event);
 }

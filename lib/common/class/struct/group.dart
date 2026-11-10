@@ -77,6 +77,9 @@ sealed class ValuedGroup<T extends Object> extends Group<T> {
 ///
 /// 単一の要素を保持します。
 final class SingleGroup<T extends Object> extends ValuedGroup<T> {
+  @override
+  List<Object?> get props => [value];
+
   final T value;
 
   const SingleGroup(this.value);
@@ -103,6 +106,9 @@ final class SingleGroup<T extends Object> extends ValuedGroup<T> {
 ///
 /// 複数の要素を保持します。
 final class MultipleGroup<T extends Object> extends ValuedGroup<T> {
+  @override
+  List<Object?> get props => [...values];
+
   @override
   final NotEmptyIterable<T> values;
 

@@ -30,7 +30,7 @@ class MissingFieldInPropsRule extends ProjectDartLintRule {
       const LintCode("missing_field_in_props", "Field '{0}' is not included in props.", correctionMessage: "Add the field to the props list for correct equality comparison.");
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     registry.addClassDeclaration(this, _Visitor(this));
   }
 }
@@ -57,10 +57,13 @@ class _Visitor extends ProjectAstVisitor {
 
     // propsゲッターを取得
     final propsGetter = _findPropsGetter(node);
-    if (propsGetter == null) return;
-
-    // propsに含まれているフィールド名を取得
-    final propsFieldNames = _getPropsFieldNames(propsGetter);
+    // An abstract equality contract may be implemented by concrete subclasses.
+    if (propsGetter == null) {
+      final inherited = classElement.lookUpGetter(name: "props", library: classElement.library);
+      if (inherited == null || inherited.isAbstract) return;
+    }
+    // Concrete inherited props cannot include fields introduced by this class.
+    final propsFieldNames = propsGetter == null ? <String>{} : _getPropsFieldNames(propsGetter);
 
     // 不足しているフィールドを検出
     for (final field in instanceFields) {
@@ -187,8 +190,9 @@ class _Visitor extends ProjectAstVisitor {
       _extractFieldNames(body.expression, names);
     } else if (body is BlockFunctionBody) {
       for (final statement in body.block.statements) {
-        if (statement is ReturnStatement && statement.expression != null) {
-          _extractFieldNames(statement.expression!, names);
+        if (statement is ReturnStatement) {
+          final expression = statement.expression;
+          if (expression != null) _extractFieldNames(expression, names);
         }
       }
     }
@@ -202,6 +206,8 @@ class _Visitor extends ProjectAstVisitor {
       for (final element in expression.elements) {
         if (element is SimpleIdentifier) {
           names.add(element.name);
+        } else if (element is SpreadElement && element.expression is SimpleIdentifier) {
+          names.add((element.expression as SimpleIdentifier).name);
         }
       }
     }

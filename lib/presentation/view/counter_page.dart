@@ -25,8 +25,8 @@ class CounterPage extends StatelessWidget {
               if (state is core.Loading) const CircularProgressIndicator(),
               if (state is core.Error) ...[
                 const Text("読み込みまたは更新に失敗しました"),
-                TextButton(onPressed: () => context.read<CounterBloc>().add(const CounterRefreshRequested()), child: const Text("再読み込み")),
               ],
+              TextButton(onPressed: state is core.Loading ? null : () => context.read<CounterBloc>().add(const CounterRefreshRequested()), child: const Text("再読み込み")),
               TextButton(
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(

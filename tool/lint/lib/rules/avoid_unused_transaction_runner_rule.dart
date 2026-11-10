@@ -27,7 +27,7 @@ class AvoidUnusedTransactionRunnerRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     registry.addClassDeclaration(this, _Visitor(this));
   }
 }

@@ -26,7 +26,7 @@ class AvoidRelativeImportExportRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     final visitor = _Visitor(this);
     registry.addImportDirective(this, visitor);
     registry.addExportDirective(this, visitor);

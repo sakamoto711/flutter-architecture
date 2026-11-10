@@ -12,9 +12,6 @@ abstract class ProjectAstVisitor extends SimpleAstVisitor<void> {
 
   final ProjectDartLintRule rule;
 
-  /// 除外ディレクトリ
-  static const _excludedDirectories = {"/tool/", "/test/"};
-
   /// 自動生成ファイルの拡張子
   static const _generatedExtensions = {".g.dart", ".freezed.dart", ".gr.dart", ".config.dart"};
 
@@ -31,8 +28,7 @@ abstract class ProjectAstVisitor extends SimpleAstVisitor<void> {
 
   /// プロジェクト直下のlib/配下のファイルかどうかを判定する
   bool _isLibPath(String path) {
-    if (_excludedDirectories.any(path.contains)) return false;
-    return path.contains("/lib/");
+    return isProjectLibPath(path, rule.packageRoot);
   }
 
   /// 自動生成ファイルかどうかを判定する
@@ -49,4 +45,12 @@ abstract class ProjectAstVisitor extends SimpleAstVisitor<void> {
     if (path == null) return false;
     return _isLibPath(path) && !_isGeneratedFile(path);
   }
+}
+
+@visibleForTesting
+bool isProjectLibPath(String path, String? packageRoot) {
+  if (packageRoot == null) return false;
+  final normalized = path.replaceAll(r"\", "/");
+  final root = packageRoot.replaceAll(r"\", "/").replaceFirst(RegExp(r"/$"), "");
+  return normalized.startsWith("$root/lib/");
 }

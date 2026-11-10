@@ -63,7 +63,10 @@ DomainEventの発行は保存完了後に行います。
 購読側は `TypedDomainEventBinding` で機能固有のBLoC Eventへ変換し、画面操作と同じ逐次キューで処理します。
 同じEventBusを使う複数のBLoCへ配信でき、`close()` で購読を解除します。
 EventBusは同期配信で、再送や永続化は行いません。
-リスナーの例外は発行元へ伝播するため、リスナーではイベントのキュー投入までを行い、非同期処理はBLoC Eventのハンドラへ置きます。
+リスナーの対象判定と通知の失敗は、イベント型、リスナー型、例外、StackTraceとともに記録し、後続リスナーへの配送を続けます。保存成功後の配送失敗はCommandの失敗にしません。
+リスナーではイベントのキュー投入までを行い、非同期処理はBLoC Eventのハンドラへ置きます。保存成功は全画面の更新完了を意味しません。更新されなかった画面は「再読み込み」で復旧できます。
+標準構成はConsoleLoggerを使い、診断先の失敗でも保存結果と後続配送を維持します。
+UseCaseからOutputPort、Resultを経由する失敗は元のStackTraceを保持し、unwrapOrThrowでもその発生箇所を引き継ぎます。
 
 ## サンプルの構成
 
@@ -154,3 +157,8 @@ BLoC は InputPort と DomainEventSubscriber に依存し、Repository や具体
 二つ目の画面では標準の `BlocProvider` を使い、同じライフサイクルを管理する例を示します。
 メモリ保存のため、アプリを再起動すると値は失われます。
 API、認証、DB、永続イベント配信、トランザクションはサンプルの対象外です。
+
+## 継続検証
+
+GitHub Actionsでアプリの解析とテスト、独自lintの解析とテスト、Mason生成物の解析とテストを実行します。
+生成物の検証は `dart run tool/mason/verify_templates.dart` で一時コピー上にBLoC、Query、Commandを生成して行い、作業中のソースを変更しません。

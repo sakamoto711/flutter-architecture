@@ -22,7 +22,7 @@ class AvoidNullForceUnwrapRule extends ProjectDartLintRule {
   );
 
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
+  void registerProjectNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
     registry.addPostfixExpression(this, _Visitor(this));
   }
 }

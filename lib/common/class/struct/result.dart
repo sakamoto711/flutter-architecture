@@ -21,8 +21,8 @@ sealed class Result<T> {
   static Result<T> runCatching<T>(T Function() action) {
     try {
       return Success<T>(action());
-    } catch (e) {
-      return Failure(e);
+    } catch (e, stackTrace) {
+      return Failure(e, stackTrace);
     }
   }
 
@@ -34,8 +34,8 @@ sealed class Result<T> {
   static Future<Result<T>> runCatchingAsync<T>(Future<T> Function() action) async {
     try {
       return Success<T>(await action());
-    } catch (e) {
-      return Failure(e);
+    } catch (e, stackTrace) {
+      return Failure(e, stackTrace);
     }
   }
 
@@ -46,7 +46,7 @@ sealed class Result<T> {
   /// 自身が[Failure]の場合は[exception]を`throw`します。
   T unwrapOrThrow() => switch (this) {
     Success(value: final value) => value,
-    Failure(exception: final exception) => throw exception,
+    Failure(:final exception, :final stackTrace) => Error.throwWithStackTrace(exception, stackTrace),
   };
 }
 
@@ -67,8 +67,9 @@ final class Success<T> extends Result<T> {
 /// `throw`されたオブジェクトが[Exception]型でない場合は、[UnexpectedThrowableException]型に変換します。
 final class Failure extends Result<Never> {
   final Exception exception;
+  final StackTrace stackTrace;
 
-  Failure(Object exception) : exception = exception.asOrNull<Exception>() ?? UnexpectedThrowableException(exception);
+  Failure(Object exception, this.stackTrace) : exception = exception.asOrNull<Exception>() ?? UnexpectedThrowableException(exception);
 }
 
 extension FutureOrResultExtension<T> on FutureOr<Result<T>> {

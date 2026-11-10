@@ -25,6 +25,7 @@ abstract class BlocBase<E extends BlocEvent, S extends State, T extends StateDat
   @protected
   final DomainEventSubscriber eventSubscriber;
   final List<DomainEventBinding<E>> _domainEventBindings;
+  bool _closing = false;
 
   @protected
   final Logger logger;
@@ -47,17 +48,18 @@ abstract class BlocBase<E extends BlocEvent, S extends State, T extends StateDat
   FutureOr<void> handleEvent(E event, original.Emitter<S> emit);
 
   Future<void> _runEventHandler(E event, original.Emitter<S> emit) async {
+    if (_closing || emit.isDone || isClosed) return;
     final initialState = state;
     try {
       await handleEvent(event, emit);
     } catch (error, stackTrace) {
-      if (_leftNewLoading(initialState)) {
+      if (!emit.isDone && !isClosed && _leftNewLoading(initialState)) {
         _recoverFromLoading(error, emit);
       }
       await Future<void>.error(error, stackTrace);
     }
 
-    if (!_leftNewLoading(initialState)) return;
+    if (emit.isDone || isClosed || !_leftNewLoading(initialState)) return;
 
     final error = EventHandlerCompletedInLoadingException(eventType: event.runtimeType);
     _recoverFromLoading(error, emit);
@@ -96,6 +98,7 @@ abstract class BlocBase<E extends BlocEvent, S extends State, T extends StateDat
 
   @override
   Future<void> close() async {
+    _closing = true;
     eventSubscriber.removeListener(this);
     await super.close();
   }
@@ -199,12 +202,13 @@ extension BlocExtension<E extends BlocEvent, S extends State, T extends StateDat
 
     try {
       final result = await action();
+      if (emit.isDone || isClosed) return;
       final complete = loading.complete(result);
       final shift = complete.shiftIfPossible<T>();
       emit(shift ?? complete);
     } catch (e, stackTrace) {
       logger.error(error: e, stackTrace: stackTrace);
-      emit(loading.error(e));
+      if (!emit.isDone && !isClosed) emit(loading.error(e));
     }
   }
 
@@ -220,11 +224,12 @@ extension BlocExtension<E extends BlocEvent, S extends State, T extends StateDat
 
     try {
       final result = await action();
+      if (emit.isDone || isClosed) return;
       final complete = loading.next(result);
       emit(complete);
     } catch (e, stackTrace) {
       logger.error(error: e, stackTrace: stackTrace);
-      emit(loading.error(e));
+      if (!emit.isDone && !isClosed) emit(loading.error(e));
     }
   }
 }

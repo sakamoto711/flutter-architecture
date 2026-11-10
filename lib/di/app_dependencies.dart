@@ -1,6 +1,6 @@
 import "/application/counter/command/increment_counter_use_case.dart";
 import "/application/counter/query/fetch_counter_use_case.dart";
-import "/common/logger/noop_logger.dart";
+import "/common/logger/console_logger.dart";
 import "/infrastructure/event/domain_event_publisher_impl.dart";
 import "/infrastructure/event/event_bus_impl.dart";
 import "/infrastructure/event/event_publisher_impl.dart";
@@ -12,8 +12,8 @@ import "/presentation/event/domain_event_subscriber_impl.dart";
 /// 同じRepositoryとEventBusを使って各層を接続するComposition Root。
 final class AppDependencies {
   final _repository = InMemoryCounterRepository();
-  final _eventBus = EventBusImpl();
-  final _logger = const NoopLogger();
+  late final _eventBus = EventBusImpl(logger: _logger);
+  final _logger = const ConsoleLogger();
 
   late final _publisher = DomainEventPublisherImpl(EventPublisherImpl(_eventBus));
   late final _subscriber = DomainEventSubscriberImpl(EventSubscriberImpl(_eventBus));

@@ -58,7 +58,7 @@ class _ThrowingOutput implements OutputPort<int> {
   @override
   Future<void> onSuccess(int result) async => throw StateError("output failed");
   @override
-  void onError(Exception e) {
+  void onError(Exception e, StackTrace stackTrace) {
     errorCalls++;
   }
 }
