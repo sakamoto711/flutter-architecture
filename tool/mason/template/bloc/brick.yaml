@@ -1,0 +1,15 @@
+name: bloc
+description: Generate a BLoC boilerplate (Bloc / Event / State / StateData)
+version: 0.1.0+1
+environment:
+  mason: ">=0.1.0 <0.2.0"
+
+vars:
+  name:
+    type: string
+    description: 'Business Logic Component名をアッパーキャメルケースで入力してください (例: FetchCategoryList)'
+    prompt: 'Business Logic Component名を教えてください'
+  output_dir:
+    type: string
+    description: '出力先のディレクトリを`lib/presentation/bloc/`からの相対パスで入力してください (例: menu/category)'
+    prompt: '生成先のディレクトリを教えてください'
